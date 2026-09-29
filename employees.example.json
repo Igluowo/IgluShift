@@ -1,0 +1,5 @@
+[
+  { "name": "Empleado 1", "weeklyContractHours": 40 },
+  { "name": "Empleado 2", "weeklyContractHours": 30 },
+  { "name": "Empleado 3", "weeklyContractHours": 20 }
+]
