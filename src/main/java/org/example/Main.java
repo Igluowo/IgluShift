@@ -5,11 +5,11 @@ import ai.timefold.solver.core.api.solver.SolverFactory;
 import ai.timefold.solver.core.config.solver.SolverConfig;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.example.shift.Employee;
 import org.example.shift.Roster;
 import org.example.shift.Shift;
 import org.example.solver.RosterConstraintProvider;
-
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
@@ -20,9 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
-    // Método auxiliar para cargar la lista desde el JSON
+
     private static List<Employee> loadEmployees(String filePath) {
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
         try {
             return mapper.readValue(new File(filePath), new TypeReference<List<Employee>>() {});
         } catch (IOException e) {
@@ -31,7 +32,6 @@ public class Main {
     }
 
     public static void main(String[] args) {
-
         SolverConfig solverConfig = new SolverConfig()
                 .withSolutionClass(Roster.class)
                 .withEntityClasses(Shift.class)

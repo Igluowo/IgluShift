@@ -15,8 +15,10 @@ public class RosterConstraintProvider implements ConstraintProvider {
                 minimiumRest12Hours(factory),
                 max5DaysWorked(factory),
                 consecutiveDaysOff(factory),
+                employeeUnavailable(factory),
                 fulfillContractHours(factory),
-                balanceClosingShifts(factory)
+                balanceClosingShifts(factory),
+                recurringTimeRestrictions(factory)
         };
     }
 
@@ -83,5 +85,21 @@ public class RosterConstraintProvider implements ConstraintProvider {
                 .groupBy(Shift::getEmployee, ConstraintCollectors.count())
                 .penalize(HardSoftScore.ONE_SOFT, (employee, closingCount) -> closingCount * closingCount)
                 .asConstraint("Reparto equitativo de cierres");
+    }
+
+    private Constraint employeeUnavailable(ConstraintFactory factory) {
+        return factory.forEach(Shift.class)
+                .filter(shift -> shift.getEmployee() != null &&
+                        shift.getEmployee().isUnavailable(shift.getStart().toLocalDate()))
+                .penalize(HardSoftScore.ONE_HARD)
+                .asConstraint("Día no disponible");
+    }
+
+    private Constraint recurringTimeRestrictions(ConstraintFactory factory) {
+        return factory.forEach(Shift.class)
+                .filter(shift -> shift.getEmployee() != null &&
+                        shift.getEmployee().isTimeRestricted(shift.getStart(), shift.getEnd()))
+                .penalize(HardSoftScore.ONE_HARD)
+                .asConstraint("Incompatibilidad horaria recurrente");
     }
 }
